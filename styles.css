@@ -25,3 +25,9 @@ section#controls {
 figcaption {
   font-style: italic;
 }
+
+video {
+  width: 640px;
+  height: 360px;
+  background-color: #666;
+}
