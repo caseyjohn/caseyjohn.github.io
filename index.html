@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="styles.css"> 
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="webserial.js"></script>
+  <script src="script.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/webcam-easy/dist/webcam-easy.min.js"></script>
+  <title>WebSerial</title>
+
+  <style>
+
+    #videoElement {
+      width: 640px;
+      height: 360px;
+      background-color: #666;
+    }
+    </style>
+</head>
+
+<body>
+  <h1>USB3 Control Example</h1>
+  <section id="explanation">
+    <p>
+      This page sends simple zoom to the camera, it can be improved!</a>. It should work on Chrome and Edge browsers.
+    </p>
+  </section>
+
+  <section id="controls">
+    <button id="portButton">open port</button><br>
+    <button id="zplus">Zoom Plus</button><br>
+    <button id="zminus">Zoom Minus</button><br>
+    Latest input from the serial port:
+    <span id="readings">no input yet </span><br>
+  </section>
+
+
+  <div id="container">
+    <video autoplay="true" id="videoElement">
+    
+    </video>
+  </div>
+
+</body>
+
+</html>
