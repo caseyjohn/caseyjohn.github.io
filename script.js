@@ -17,7 +17,11 @@ let timeSpan;     // DOM element for one special reading
 let webserial;
 var ask_erase = false;
 var wait_erase = false;
+let countdownEl;
+let progressBarEl ;
 
+let remainingTime = 60; // seconds
+let totalTime = remainingTime;
 
 var firmwareArray = null;
 
@@ -35,6 +39,11 @@ function setup() {
   updateusb3_file.addEventListener("change", updateUSB3);
 
   loader = document.getElementById("loader");
+
+  loader.style.display = 'none';
+
+  countdownEl = document.querySelector(".countdown");
+  progressBarEl = document.querySelector(".progress");
 
   infoSpan.innerHTML = "Configuré";
 
@@ -70,6 +79,25 @@ if (navigator.mediaDevices.getUserMedia) {
     });
 }
 
+
+}
+
+function countdown() {
+  if (remainingTime > 0) {
+    // update countdown timer
+    countdownEl.textContent = Math.trunc(remainingTime);
+ 
+    // update progress bar
+    const progress = ((totalTime - remainingTime) / totalTime) * 100;
+    progressBarEl.style.width = `${progress}%`;
+ 
+    remainingTime--;
+    setTimeout(countdown, 1000);
+  } else {
+    // countdown finished
+    progressBarEl.style.width = "100%";
+    countdownEl.textContent = "Programming finished!";
+  }
 }
 
 function log(data) {
@@ -92,22 +120,31 @@ function move(pos) {
 async function SendFile(file) {
   const reader = new FileReader();
   reader.addEventListener('load', (event) => {
-    const firmwareArray = event.target.result;
-    log("File was selected, size: " + firmwareArray.byteLength + " bytes");
-    
-    log(firmwareArray);
-    
-
-
-    log("Start");
-    webserial.baudrate = ubaudrate.value;
-    webserial.reloadbaudrate();
-    webserial.sendSerial(firmwareArray);
-    
-    
-    log("Stop");
+    firmwareArray = event.target.result;
+    flash();
     // Do something with result
   });
+
+  async function flash() {
+    
+      log(firmwareArray);
+      log("Start");
+      webserial.baudrate = 115200;//ubaudrate.value;
+  
+      await webserial.reloadbaudrate();
+  
+      
+  
+      webserial.sendSerial(firmwareArray);
+
+      totalTime = (firmwareArray.byteLength / webserial.baudrate) *10;
+      remainingTime = totalTime;
+      countdown();
+      
+      
+      log("Stop");
+      // Do something with result
+    };
 
   if (file != null)
       reader.readAsArrayBuffer(file);
@@ -322,8 +359,10 @@ function serialRead(event) {
       log("ACK FPGA!");
       if (ask_erase === true)
       {
-        log("Erasing!");
+        
         loader.style.display = 'block';
+        log("Erasing!");
+        
         wait_erase = true;
         ask_erase = false;
       }
@@ -336,7 +375,10 @@ function serialRead(event) {
         wait_erase = false;
         SendFile(file);
       }
-      loader.style.display = 'none';
+      else
+      {
+        loader.style.display = 'none';
+      }
     }
     else if((new_message.every((element, index) => element === ack[index])))
     {

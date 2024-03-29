@@ -1,14 +1,7 @@
 /*
   WebSerial wrapper
   Simplifies WebSerial
-
-  created 15 May 2022
-  modified 16 May 2022
-  by Tom Igoe
 */
-
-// TODO: multiple ports
-// TODO: multiple data types
 
 // need self = this for connect/disconnect functions
 let self;
@@ -20,7 +13,6 @@ class WebSerialPort {
       alert("WebSerial is not enabled in this browser");
       return false;
     }
-    // TODO: make this an option.
     this.autoOpen = true;
     // copy this to a global variable so that
     // connect/disconnect can access it:
@@ -43,7 +35,6 @@ class WebSerialPort {
       bubbles: true
     });
 
-    // TODO: bubble these up to calling script
     // so that you can change button names on 
     // connect or disconnect:
     navigator.serial.addEventListener("connect", this.serialConnect);
@@ -62,15 +53,12 @@ class WebSerialPort {
       if (thisPort == null) {
         // pop up window to select port:
         this.port = await navigator.serial.requestPort({
-          //filters: [{ usbVendorId: 0x04B4 }],
         });
       } else {
         // open the port that was passed:
         this.port = thisPort;
       }
       // set port settings and open it:
-      // TODO: make port settings configurable
-      // from calling script:
       await this.port.open({ baudRate: this.baudrate });
       // start the listenForSerial function:
       this.serialReadPromise = this.listenForSerial();
@@ -84,9 +72,14 @@ class WebSerialPort {
   async reloadbaudrate() {
     try {
       // if no port is passed to this function, 
+      this.reader.cancel();
+      log("reload");
+      await this.serialReadPromise;
+      await new Promise(r => setTimeout(r, 1000));
       await this.port.close();
       await this.port.open({ baudRate: this.baudrate });
-     
+      this.serialReadPromise = this.listenForSerial();
+      log("reload done");
     } catch (err) {
       // if there's an error opening the port:
       console.error("There was an error reloading the serial port:", err);
@@ -118,23 +111,12 @@ class WebSerialPort {
         
         // initialize the writer:
         const writer = this.port.writable.getWriter();
-        // convert the data to be sent to an array:
-        // TODO: make it possible to send as binary:
-        //var output = new TextEncoder().encode(data);
-        // send it, then release the writer:
-        //writer.write(data).then(writer.releaseLock());
-          await writer.ready;
-          await writer.write(data);
-        //writer.write(data);
-        console.log("All chunks written");
         await writer.ready;
+        // Write data
+        await writer.write(data);
+        await writer.ready;
+        // release lock
         await writer.releaseLock();
-        // await new Promise((resolve, reject) => {
-        //   setTimeout(function() {
-        //     log("Sent" + file);
-        //     resolve();
-        //   }, 10000);
-        // });
         
       }
     } catch (err) {
@@ -155,7 +137,6 @@ class WebSerialPort {
         const { value, done } = await this.reader.read();
         if (value) {
           // convert the input to a text string:
-          // TODO: make it possible to receive as binary:
           this.incoming.data = value;
 
           // fire the event:
