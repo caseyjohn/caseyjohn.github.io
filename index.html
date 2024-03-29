@@ -22,11 +22,22 @@
   </section>
 
   <section id="controls">
-    <button id="portButton">open port</button><br>
-    <button id="zplus">Zoom Plus</button><br>
+    <button id="portButton">open port</button>
+    Baud: <select id="ubaud" title="Optimal: 115200 baud"><option value="115200">115200</option><option value="9600">9600</option></select>
+    <br>
+    <button id="zplus">Zoom Plus</button>
     <button id="zminus">Zoom Minus</button><br>
+    <button id="erase">Erase</button><br>
+
+    Select Firmware: <input type="file" accept=".mcs" id="file"/><br><br>
+
     Latest input from the serial port:
     <span id="readings">no input yet </span><br>
+
+    Info log: 
+    <span id="info">Rien </span><br>
+
+    <div id="loader" class="loader"></div>
   </section>
 
 

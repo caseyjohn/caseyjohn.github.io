@@ -30,6 +30,8 @@ class WebSerialPort {
     this.port;
     this.reader;
     this.serialReadPromise;
+
+    this.baudrate;
     // add an incoming data event:
     // TODO: data should probably be an ArrayBuffer or Stream
     this.incoming = {
@@ -59,7 +61,9 @@ class WebSerialPort {
       // if no port is passed to this function, 
       if (thisPort == null) {
         // pop up window to select port:
-        this.port = await navigator.serial.requestPort();
+        this.port = await navigator.serial.requestPort({
+          //filters: [{ usbVendorId: 0x04B4 }],
+        });
       } else {
         // open the port that was passed:
         this.port = thisPort;
@@ -67,7 +71,7 @@ class WebSerialPort {
       // set port settings and open it:
       // TODO: make port settings configurable
       // from calling script:
-      await this.port.open({ baudRate: 9600 });
+      await this.port.open({ baudRate: this.baudrate });
       // start the listenForSerial function:
       this.serialReadPromise = this.listenForSerial();
 
@@ -76,6 +80,20 @@ class WebSerialPort {
       console.error("There was an error opening the serial port:", err);
     }
   }
+
+  async reloadbaudrate() {
+    try {
+      // if no port is passed to this function, 
+      await this.port.close();
+      await this.port.open({ baudRate: this.baudrate });
+     
+    } catch (err) {
+      // if there's an error opening the port:
+      console.error("There was an error reloading the serial port:", err);
+    }
+  }
+
+ 
 
   async closePort() {
     if (this.port) {
@@ -90,19 +108,38 @@ class WebSerialPort {
     }
   }
 
+  
   async sendSerial(data) {
     // if there's no port open, skip this function:
-    if (!this.port) return;
-    // if the port's writable: 
-    if (this.port.writable) {
-      
-      // initialize the writer:
-      const writer = this.port.writable.getWriter();
-      // convert the data to be sent to an array:
-      // TODO: make it possible to send as binary:
-      //var output = new TextEncoder().encode(data);
-      // send it, then release the writer:
-      writer.write(data).then(writer.releaseLock());
+    try {
+      if (!this.port) return;
+      // if the port's writable: 
+      if (this.port.writable) {
+        
+        // initialize the writer:
+        const writer = this.port.writable.getWriter();
+        // convert the data to be sent to an array:
+        // TODO: make it possible to send as binary:
+        //var output = new TextEncoder().encode(data);
+        // send it, then release the writer:
+        //writer.write(data).then(writer.releaseLock());
+          await writer.ready;
+          await writer.write(data);
+        //writer.write(data);
+        console.log("All chunks written");
+        await writer.ready;
+        await writer.releaseLock();
+        // await new Promise((resolve, reject) => {
+        //   setTimeout(function() {
+        //     log("Sent" + file);
+        //     resolve();
+        //   }, 10000);
+        // });
+        
+      }
+    } catch (err) {
+      // if there's an error opening the port:
+      console.error("There was an error writing on the serial port:", err);
     }
   }
 
