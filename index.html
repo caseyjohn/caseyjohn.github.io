@@ -16,37 +16,39 @@
   <p><strong>Password:</strong> <span id="passwordOutput"></span></p>
 
   <script>
-    function generateSSID() {
+    // Fonction principale pour générer SSID et mot de passe
+    async function generateSSID() {
       const mac = document.getElementById('macInput').value.trim();
       if (!mac || mac.length !== 6) {
         alert("Please enter exactly 6 characters for the MAC address.");
         return;
       }
 
-      // Generate SHA-256 hash
-      async function hashSHA256(input) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(input);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-      }
+      // Hachage SHA-256
+      const sha = await hashSHA256(mac);
 
-      hashSHA256(mac).then(sha256 => {
-        // Generate SSID
-        let ssid = sha256.slice(0, 32);
-        let pass = sha256.slice(-32);
-        
-        // Simulate CRC32 (simplified version)
-        ssid = `tX_Encounter_${crc32(ssid)}`;
+      // SSID (les 32 premiers caractères après CRC32)
+      let ssidPart = sha.slice(0, 32);
+      const ssidCRC32 = `tX_Encounter_${crc32(ssidPart)}`;
 
-        // Update the page
-        document.getElementById('ssidOutput').textContent = ssid;
-        document.getElementById('passwordOutput').textContent = pass;
-      });
+      // Mot de passe (32 derniers caractères inversés)
+      let pass = sha.slice(-32).split('').reverse().join('');
+
+      // Mise à jour de la page
+      document.getElementById('ssidOutput').textContent = ssidCRC32;
+      document.getElementById('passwordOutput').textContent = pass;
     }
 
-    // Simple CRC32 implementation in JavaScript
+    // Fonction de hachage SHA-256
+    async function hashSHA256(input) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(input);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Fonction CRC32 (implémentation complète)
     function crc32(str) {
       let crc = 0 ^ -1;
       for (let i = 0; i < str.length; i++) {
@@ -55,6 +57,7 @@
       return (crc ^ -1) >>> 0;
     }
 
+    // Table CRC32
     const crcTable = (() => {
       let c;
       const table = [];
