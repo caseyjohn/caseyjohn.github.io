@@ -1,0 +1,67 @@
+
+{
+    "USB3": 
+    {
+      "manufacturer": "i2S",
+      "start": 129,
+      "terminator": 255,
+      "communication": {
+        "command": {
+          "QQ": 1,
+          "RR": 4,
+          "Set": 32,
+          "Read": 32,
+          "registers": {
+            "FPGA_Status": {
+              "Adress": 0,
+              "Size": 1
+            },
+            "Width": {
+              "Adress": 1,
+              "Size": 2
+            },
+            "Height": {
+              "Adress": 3,
+              "Size": 2
+            },
+            "FPS": {
+              "Adress": 5,
+              "Size": 2
+            }
+          }
+        }
+      }
+    },
+    "3G-SDI": 
+    {
+      "manufacturer": "i2S",
+      "start": 130,
+      "terminator": 255,
+      "communication": {
+        "command": {
+          "QQ": 1,
+          "RR": 4,
+          "Set": 32,
+          "Read": 32,
+          "registers": {
+            "FPGA_Status": {
+              "Adress": 0,
+              "Size": 1
+            },
+            "Width": {
+              "Adress": 1,
+              "Size": 2
+            },
+            "Height": {
+              "Adress": 3,
+              "Size": 2
+            },
+            "FPS": {
+              "Adress": 5,
+              "Size": 2
+            }
+          }
+        }
+      }
+    }
+  }

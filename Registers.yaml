@@ -1,0 +1,24 @@
+board:
+  id: "USB3"
+  manufacturer: "i2S"
+  start: 0x82
+  terminator: 0xFF
+  communication:
+    command:
+      QQ: 0x01
+      RR: 0x04
+      Set: 0x20
+      Read: 0x20
+      registers:
+        FPGA_Status:
+          Adress: 0x00
+          Size: 1
+        Width:
+          Adress: 0x01
+          Size: 2
+        Height:
+          Adress: 0x03
+          Size: 2
+        FPS:
+          Adress: 0x05
+          Size: 2

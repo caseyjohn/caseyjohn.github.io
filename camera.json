@@ -1,0 +1,64 @@
+
+{
+    "Cameras": [
+        {
+            "manufacturer": "Generic",
+            "start": "0x81",
+            "terminator": "0xFF",
+            "command": {
+                "QQ": "0x01",
+                "RR": "0x04",
+                "list": {
+                    "Zoom": {
+                        "Address": "0x62",
+                        "List": {
+                            "On" : "0x02",
+                            "Off" : "0x03"
+                        }
+                    },
+                    "Zoom_cmd": {
+                        "Address": "0x07",
+                        "List": {
+                            "Tele" : "0x02",
+                            "Wide" : "0x03"
+                        }
+                    },
+                    "Freeze": {
+                        "Address": "0x62",
+                        "List": {
+                            "On" : "0x02",
+                            "Off" : "0x03"
+                        }
+                    },
+                    "Exposure": {
+                        "Address": "0x39",
+                        "List": {
+                            "Auto" : "0x02",
+                            "Shutter" : "0x03",
+                            "Iris" : "0x04",
+                            "Autre" : "0x05"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "manufacturer": "Sony",
+            "ID" : "0xde01",
+            "start": "0x81",
+            "terminator": "0xFF",
+            "command": {
+                "QQ": "0x01",
+                "RR": "0x04",
+                "list": {
+                    "Exposure": {
+                        "Address": "0x39",
+                        "List": {
+                            "SuperAE" : "0xAA"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

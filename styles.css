@@ -1,77 +1,95 @@
+/* styles.css */
+
 body {
-  font-family: "Helvetica", "Arial", sans-serif;
-  font-size: 12pt;
-  line-height: normal;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
 }
 
-input {
-  position: sticky;
-  left: 250px;
-}
-
-span {
-  position: sticky;
-  left: 250px;
-}
-
-section#explanation {
-  width: 600px;
-}
-
-section#controls {
-  padding: 20px;
-}
-
-figcaption {
-  font-style: italic;
-}
-
-video {
-  width: 640px;
-  height: 360px;
-  background-color: #666;
-}
-
-#myProgress {
-  width: 100%;
-  background-color: #ddd;
-}
-
-#myBar {
-  width: 0%;
-  height: 30px;
-  background-color: #04AA6D;
+h1 {
   text-align: center;
-  line-height: 30px;
-  color: white;
+  color: #333;
 }
 
-.loader {
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
+#explanation {
+  margin: 20px auto;
+  max-width: 600px;
+  text-align: center;
+}
+
+#controls {
+  margin: 20px auto;
+  max-width: 600px;
+  text-align: center;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 5px;
+  font-size: 16px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+select {
+  padding: 5px;
+  font-size: 16px;
+}
+
+#loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
   border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-bottom: -5px;
 }
 
 .progress-bar {
-  width: 300px;
-  height: 20px;
-  background-color: #f2f2f2;
-  position: relative;
+  width: 100%;
+  background-color: #f3f3f3;
+  border-radius: 5px;
+  margin: 10px 0;
 }
- 
+
 .progress {
-  height: 100%;
+  height: 20px;
   background-color: #4caf50;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0%;
+  border-radius: 5px;
+  width: 0;
+  transition: width 0.3s ease;
+}
+
+.countdown {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+}
+
+#video {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#videoElement {
+  max-width: 100%;
+  height: auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

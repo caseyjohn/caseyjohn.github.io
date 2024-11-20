@@ -224,8 +224,11 @@ async function ZoomPlus() {
   d[5] = 0xFF; // start bit byte cmd swire = 1
 
   webserial.sendSerial(d);
+
+
  
 }
+
 
 async function ZoomMinus() {
   let d = new Uint8Array(6); // word swire 10 bits = 10 bytes UART
