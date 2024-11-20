@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="styles.css"> 
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="webserial.js"></script>
+  <script src="script.js"></script>
+  <title>WebSerial</title>
+</head>
+
+<body>
+  <!-- Port COM Section -->
+  <section id="port-section">
+    <h1>Port COM</h1>
+    <button id="portButton">Open Port</button>
+    Baud: <select id="ubaud" title="Optimal: 115200 baud">
+      <option value="115200">115200</option>
+      <option value="9600">9600</option>
+    </select>
+    <br>Latest input from the serial port:
+    <span id="readings">no input yet</span><br>
+    Info log: 
+    <span id="info">Rien</span><br>
+  </section>
+
+  <!-- Commande caméra Section -->
+  <section id="camera-control-section">
+    <h1>Commande caméra</h1>
+    <button id="zplus">Zoom Plus</button>
+    <button id="zminus">Zoom Minus</button>
+  </section>
+
+  <!-- Mise à jour Section -->
+  <section id="update-section">
+    <h1>Mise à jour</h1>
+    <button id="erase">Erase</button><br>
+    Select Firmware: <input type="file" accept=".mcs" id="file"/><br><br>
+    <div id="loader" class="loader"></div>
+    <label for="file">File progress:</label>
+    <div class="progress-bar">
+      <div class="progress"></div>
+    </div>
+    <span class="countdown"></span>
+  </section>
+
+  <!-- Vidéo Section -->
+  <section id="video-section">
+    <h1>Vidéo</h1>
+    <div id="video">
+      <video autoplay="true" id="videoElement"></video>
+    </div>
+  </section>
+</body>
+
+</html>

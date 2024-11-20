@@ -1,58 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <link rel="stylesheet" href="styles.css"> 
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="webserial.js"></script>
-  <script src="script.js"></script>
-  <title>WebSerial</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wi-Fi SSID and Password Generator</title>
 </head>
-
 <body>
-  <!-- Port COM Section -->
-  <section id="port-section">
-    <h1>Port COM</h1>
-    <button id="portButton">Open Port</button>
-    Baud: <select id="ubaud" title="Optimal: 115200 baud">
-      <option value="115200">115200</option>
-      <option value="9600">9600</option>
-    </select>
-    <br>Latest input from the serial port:
-    <span id="readings">no input yet</span><br>
-    Info log: 
-    <span id="info">Rien</span><br>
-  </section>
+  <h1>Wi-Fi SSID and Password Generator</h1>
+  <form id="macForm">
+    <label for="mac">Enter MAC Address (last 6 digits):</label>
+    <input type="text" id="mac" name="mac" required maxlength="6">
+    <button type="submit">Generate</button>
+  </form>
+  
+  <h2>Generated SSID and Password</h2>
+  <p><strong>SSID:</strong> <span id="ssid"></span></p>
+  <p><strong>Password:</strong> <span id="password"></span></p>
 
-  <!-- Commande caméra Section -->
-  <section id="camera-control-section">
-    <h1>Commande caméra</h1>
-    <button id="zplus">Zoom Plus</button>
-    <button id="zminus">Zoom Minus</button>
-  </section>
+  <script>
+    // CRC32 function (polyfill)
+    function crc32(str) {
+      let crc = 0xffffffff;
+      for (let i = 0; i < str.length; i++) {
+        const byte = str.charCodeAt(i);
+        crc = crc ^ byte;
+        for (let j = 0; j < 8; j++) {
+          const mask = -(crc & 1);
+          crc = (crc >>> 1) ^ (0xedb88320 & mask);
+        }
+      }
+      return (crc ^ 0xffffffff) >>> 0;
+    }
 
-  <!-- Mise à jour Section -->
-  <section id="update-section">
-    <h1>Mise à jour</h1>
-    <button id="erase">Erase</button><br>
-    Select Firmware: <input type="file" accept=".mcs" id="file"/><br><br>
-    <div id="loader" class="loader"></div>
-    <label for="file">File progress:</label>
-    <div class="progress-bar">
-      <div class="progress"></div>
-    </div>
-    <span class="countdown"></span>
-  </section>
+    // Form submission handler
+    document.getElementById('macForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      const mac = document.getElementById('mac').value;
+      if (!mac) {
+        alert("Please provide a MAC address (last 6 digits).");
+        return;
+      }
 
-  <!-- Vidéo Section -->
-  <section id="video-section">
-    <h1>Vidéo</h1>
-    <div id="video">
-      <video autoplay="true" id="videoElement"></video>
-    </div>
-  </section>
+      // Generate SHA-256 hash
+      const shaObj = new TextEncoder().encode(mac);
+      crypto.subtle.digest('SHA-256', shaObj).then(buffer => {
+        const hashArray = Array.from(new Uint8Array(buffer));
+        const sha = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+        // Generate SSID and Password
+        const ssid = `tX_Encounter_${crc32(sha.slice(0, 32))}`;
+        const password = sha.split('').reverse().join('').slice(0, 32);
+
+        // Display results
+        document.getElementById('ssid').textContent = ssid;
+        document.getElementById('password').textContent = password;
+      });
+    });
+  </script>
 </body>
-
 </html>
