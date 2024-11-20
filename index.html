@@ -7,8 +7,8 @@
 </head>
 <body>
   <h1>Wi-Fi SSID and Password Generator</h1>
-  <p>Enter the last 12 digits of the MAC address:</p>
-  <input type="text" id="macInput" maxlength="12" placeholder="e.g., 1A2B3CEEEEEE">
+  <p>Enter 12 characters (e.g., last 12 digits of a MAC address):</p>
+  <input type="text" id="macInput" maxlength="12" placeholder="e.g., f8dc7a40b1bc">
   <button onclick="generateSSID()">Generate</button>
 
   <h2>Generated Wi-Fi Details</h2>
@@ -16,30 +16,29 @@
   <p><strong>Password:</strong> <span id="passwordOutput"></span></p>
 
   <script>
-    // Fonction principale pour générer SSID et mot de passe
     async function generateSSID() {
       const mac = document.getElementById('macInput').value.trim();
       if (!mac || mac.length !== 12) {
-        alert("Please enter exactly 6 characters for the MAC address.");
+        alert("Please enter exactly 12 characters.");
         return;
       }
 
-      // Hachage SHA-256
+      // SHA-256 hash
       const sha = await hashSHA256(mac);
 
-      // SSID (les 32 premiers caractères après CRC32)
+      // SSID (CRC32 applied to the first 32 chars of SHA256 hash)
       let ssidPart = sha.slice(0, 32);
-      const ssidCRC32 = `tX_Encounter_${crc32(ssidPart)}`;
+      const ssidCRC32 = `tX_Encounter_${computeCRC32(ssidPart)}`;
 
-      // Mot de passe (32 derniers caractères inversés)
-      let pass = sha.slice(-32).split('').reverse().join('');
+      // Password (last 32 chars of SHA256 hash, reversed)
+      let pass = sha.slice(-32).split('').reverse().join('').reverse();
 
-      // Mise à jour de la page
+      // Update the page
       document.getElementById('ssidOutput').textContent = ssidCRC32;
       document.getElementById('passwordOutput').textContent = pass;
     }
 
-    // Fonction de hachage SHA-256
+    // Function to compute SHA-256
     async function hashSHA256(input) {
       const encoder = new TextEncoder();
       const data = encoder.encode(input);
@@ -48,28 +47,30 @@
       return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
     }
 
-    // Fonction CRC32 (implémentation complète)
-    function crc32(str) {
+    // Compute CRC32 and return as hexadecimal string
+    function computeCRC32(str) {
+      const crcTable = makeCRCTable();
       let crc = 0 ^ -1;
       for (let i = 0; i < str.length; i++) {
         crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xff];
       }
-      return (crc ^ -1) >>> 0;
+      crc = (crc ^ -1) >>> 0; // Final CRC32 value
+      return crc.toString(16).padStart(8, '0'); // Convert to hexadecimal and pad to 8 chars
     }
 
-    // Table CRC32
-    const crcTable = (() => {
+    // Create the CRC32 lookup table
+    function makeCRCTable() {
       let c;
-      const table = [];
+      const crcTable = [];
       for (let n = 0; n < 256; n++) {
         c = n;
         for (let k = 0; k < 8; k++) {
           c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
         }
-        table[n] = c;
+        crcTable[n] = c;
       }
-      return table;
-    })();
+      return crcTable;
+    }
   </script>
 </body>
 </html>
