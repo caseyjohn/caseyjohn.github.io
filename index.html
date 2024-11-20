@@ -7,56 +7,66 @@
 </head>
 <body>
   <h1>Wi-Fi SSID and Password Generator</h1>
-  <form id="macForm">
-    <label for="mac">Enter MAC Address (last 6 digits):</label>
-    <input type="text" id="mac" name="mac" required maxlength="6">
-    <button type="submit">Generate</button>
-  </form>
-  
-  <h2>Generated SSID and Password</h2>
-  <p><strong>SSID:</strong> <span id="ssid"></span></p>
-  <p><strong>Password:</strong> <span id="password"></span></p>
+  <p>Enter the last 6 digits of the MAC address:</p>
+  <input type="text" id="macInput" maxlength="6" placeholder="e.g., 1A2B3C">
+  <button onclick="generateSSID()">Generate</button>
+
+  <h2>Generated Wi-Fi Details</h2>
+  <p><strong>SSID:</strong> <span id="ssidOutput"></span></p>
+  <p><strong>Password:</strong> <span id="passwordOutput"></span></p>
 
   <script>
-    // CRC32 function (polyfill)
-    function crc32(str) {
-      let crc = 0xffffffff;
-      for (let i = 0; i < str.length; i++) {
-        const byte = str.charCodeAt(i);
-        crc = crc ^ byte;
-        for (let j = 0; j < 8; j++) {
-          const mask = -(crc & 1);
-          crc = (crc >>> 1) ^ (0xedb88320 & mask);
-        }
-      }
-      return (crc ^ 0xffffffff) >>> 0;
-    }
-
-    // Form submission handler
-    document.getElementById('macForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-      
-      const mac = document.getElementById('mac').value;
-      if (!mac) {
-        alert("Please provide a MAC address (last 6 digits).");
+    function generateSSID() {
+      const mac = document.getElementById('macInput').value.trim();
+      if (!mac || mac.length !== 6) {
+        alert("Please enter exactly 6 characters for the MAC address.");
         return;
       }
 
       // Generate SHA-256 hash
-      const shaObj = new TextEncoder().encode(mac);
-      crypto.subtle.digest('SHA-256', shaObj).then(buffer => {
-        const hashArray = Array.from(new Uint8Array(buffer));
-        const sha = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+      async function hashSHA256(input) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(input);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+      }
 
-        // Generate SSID and Password
-        const ssid = `tX_Encounter_${crc32(sha.slice(0, 32))}`;
-        const password = sha.split('').reverse().join('').slice(0, 32);
+      hashSHA256(mac).then(sha256 => {
+        // Generate SSID
+        let ssid = sha256.slice(0, 32);
+        let pass = sha256.slice(-32);
+        
+        // Simulate CRC32 (simplified version)
+        ssid = `tX_Encounter_${crc32(ssid)}`;
 
-        // Display results
-        document.getElementById('ssid').textContent = ssid;
-        document.getElementById('password').textContent = password;
+        // Update the page
+        document.getElementById('ssidOutput').textContent = ssid;
+        document.getElementById('passwordOutput').textContent = pass;
       });
-    });
+    }
+
+    // Simple CRC32 implementation in JavaScript
+    function crc32(str) {
+      let crc = 0 ^ -1;
+      for (let i = 0; i < str.length; i++) {
+        crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xff];
+      }
+      return (crc ^ -1) >>> 0;
+    }
+
+    const crcTable = (() => {
+      let c;
+      const table = [];
+      for (let n = 0; n < 256; n++) {
+        c = n;
+        for (let k = 0; k < 8; k++) {
+          c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        }
+        table[n] = c;
+      }
+      return table;
+    })();
   </script>
 </body>
 </html>
